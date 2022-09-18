@@ -7,10 +7,11 @@ import { parse } from "csv-parse"
 const app = express()
 const port = process.env.PORT || 8000
 
-fs.createReadStream("./static/test.csv")
+fs.createReadStream("./static/nasdaq_screener_1662493446154.csv")
   .pipe(parse({ delimiter: ",", from_line: 2 }))
   .on("data", function (row) {
-    console.log(row)
+    const symbols = row[0]
+    console.log(symbols)
   })
   .on("error", function (error) {
     console.log(error.message)

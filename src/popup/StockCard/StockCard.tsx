@@ -8,13 +8,18 @@ import {
   Typography,
 } from "@material-ui/core"
 import { fetchTwelveDataData, TwelveDataData } from "../../utils/api"
+import "./StockCard.css"
+
+var cardStyle = {
+  display: "inline-block",
+}
 
 const StockCardContainer: React.FC<{
   children: React.ReactNode
   onDelete?: () => void
 }> = ({ children, onDelete }) => {
   return (
-    <Box mx={"4px"} my={"16px"}>
+    <Box mx={"14px"} my={"16px"}>
       <Card>
         <CardContent>{children}</CardContent>
         <CardActions>
@@ -49,13 +54,15 @@ const StockCard: React.FC<{
 
   if (cardstate == "loading" || cardstate == "error") {
     return (
-      <StockCardContainer onDelete={onDelete}>
-        <Typography variant="body1">
-          {cardstate == "loading"
-            ? "Loading..."
-            : "Error: could not retrieve stock data for this symbol"}
-        </Typography>
-      </StockCardContainer>
+      <Card style={cardStyle}>
+        <StockCardContainer onDelete={onDelete}>
+          <Typography variant="body1">
+            {cardstate == "loading"
+              ? "Loading..."
+              : "Error: could not retrieve stock data for this symbol"}
+          </Typography>
+        </StockCardContainer>
+      </Card>
     )
   }
 
@@ -76,28 +83,31 @@ const StockCard: React.FC<{
 
   if (stockData.meta && stockData.values) {
     return (
-      <StockCardContainer onDelete={onDelete}>
-        <Typography variant="h5">{stockData.meta.symbol}</Typography>
-        <Typography variant="body1">
-          Price: ${deleteTrailingZeros(parseFloat(stockData.values[0].close))}
-        </Typography>
-        <Typography variant="body1">
-          Change:{" "}
-          {calculatePercentChange(
-            parseFloat(stockData.values[1].close),
-            parseFloat(stockData.values[0].close)
-          )}
-          %
-        </Typography>
-      </StockCardContainer>
+      <Card style={cardStyle} className="Card">
+        <StockCardContainer onDelete={onDelete}>
+          <Typography variant="h5">{stockData.meta.symbol}</Typography>
+          <Typography variant="body1">
+            ${deleteTrailingZeros(parseFloat(stockData.values[0].close))}
+          </Typography>
+          <Typography variant="body1">
+            {calculatePercentChange(
+              parseFloat(stockData.values[1].close),
+              parseFloat(stockData.values[0].close)
+            )}
+            %
+          </Typography>
+        </StockCardContainer>
+      </Card>
     )
   } else {
     return (
-      <StockCardContainer onDelete={onDelete}>
-        <Typography variant="body1">
-          Error: could not retrieve stock data for this symbol
-        </Typography>
-      </StockCardContainer>
+      <Card style={cardStyle}>
+        <StockCardContainer onDelete={onDelete}>
+          <Typography variant="body1">
+            Error: could not retrieve stock data for this symbol
+          </Typography>
+        </StockCardContainer>
+      </Card>
     )
   }
 }
