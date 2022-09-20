@@ -9,6 +9,8 @@ import {
 } from "@material-ui/core"
 import { fetchTwelveDataData, TwelveDataData } from "../../utils/api"
 import "./StockCard.css"
+import { red } from "@material-ui/core/colors"
+//import { ControlPointSharp } from "@material-ui/icons"
 
 var cardStyle = {
   display: "inline-block",
@@ -20,7 +22,7 @@ const StockCardContainer: React.FC<{
 }> = ({ children, onDelete }) => {
   return (
     <Box mx={"14px"} my={"16px"}>
-      <Card>
+      <Card style={cardStyle}>
         <CardContent>{children}</CardContent>
         <CardActions>
           {onDelete && (
@@ -78,10 +80,35 @@ const StockCard: React.FC<{
 
   const calculatePercentChange = (openPrice, currentPrice) => {
     var percentChange = ((currentPrice - openPrice) / openPrice) * 100
-    return percentChange.toFixed(2)
+    if (percentChange > 0) {
+      return "+" + percentChange.toFixed(2)
+    } else {
+      return percentChange.toFixed(2)
+    }
+  }
+
+  const colorCalculator = (openPrice, currentPrice) => {
+    var color = ""
+    var percentChange = ((currentPrice - openPrice) / openPrice) * 100
+    if (percentChange > 0) {
+      color = "rgb(51, 255, 51, 0.8)"
+    }
+    if (percentChange < 0) {
+      color = "rgb(233, 53, 39, 0.8)"
+    }
+    return color
   }
 
   if (stockData.meta && stockData.values) {
+    var symbolColor = colorCalculator(
+      parseFloat(stockData.values[1].close),
+      parseFloat(stockData.values[0].close)
+    )
+
+    var fontStyle = {
+      color: symbolColor,
+    }
+
     return (
       <Card style={cardStyle} className="Card">
         <StockCardContainer onDelete={onDelete}>
@@ -89,7 +116,7 @@ const StockCard: React.FC<{
           <Typography variant="body1">
             ${deleteTrailingZeros(parseFloat(stockData.values[0].close))}
           </Typography>
-          <Typography variant="body1">
+          <Typography style={fontStyle} variant="body1">
             {calculatePercentChange(
               parseFloat(stockData.values[1].close),
               parseFloat(stockData.values[0].close)

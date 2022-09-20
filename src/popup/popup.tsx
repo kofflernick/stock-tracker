@@ -15,6 +15,7 @@ import StockCard from "./StockCard"
 import { setStoredTickers, getStoredTickers } from "../utils/storage"
 // import fs from "fs"
 // import { parse } from "csv-parse"
+import * as symbols from "../../backend/server.js"
 
 var cardStyle = {
   display: "inline-block",
@@ -42,18 +43,6 @@ const App: React.FC<{}> = () => {
 
   //this shows what is being put into the input bar AS you type it
   console.log(tickerInput)
-
-  // fs.createReadStream("src/static/test.csv")
-  //   .pipe(parse({ delimiter: ",", from_line: 2 }))
-  //   .on("data", function (row) {
-  //     console.log(row)
-  //   })
-  //   .on("error", function (error) {
-  //     console.log(error.message)
-  //   })
-  //   .on("end", function () {
-  //     console.log("finished")
-  //   })
 
   //function that will handle enter button for adding tickers
   const handleTickerEnterClick = (Event) => {
