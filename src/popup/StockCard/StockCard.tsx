@@ -72,18 +72,26 @@ const StockCard: React.FC<{
     var Price
     if (rawPrice < 1) {
       Price = rawPrice.toFixed(3)
-    } else {
+    } else if (rawPrice >= 1 && rawPrice < 1000) {
+      Price = rawPrice.toFixed(2)
+    } else if (rawPrice >= 1000) {
       Price = rawPrice.toFixed(2)
     }
+
     return Price
   }
 
   const calculatePercentChange = (previousPrice, currentPrice) => {
     var percentChange = ((currentPrice - previousPrice) / previousPrice) * 100
-    if (percentChange > 0) {
-      return /*"+" +*/ percentChange.toFixed(2)
+    return percentChange.toFixed(2)
+  }
+
+  const calculateDollarChange = (previousPrice, currentPrice) => {
+    var dollarChange = Math.abs(previousPrice - currentPrice)
+    if (previousPrice > currentPrice) {
+      return "-" + dollarChange.toFixed(2)
     } else {
-      return percentChange.toFixed(2)
+      return "+" + dollarChange.toFixed(2)
     }
   }
 
@@ -116,7 +124,12 @@ const StockCard: React.FC<{
             ${deleteTrailingZeros(currentPrice)}
           </Typography>
           <Typography style={fontStyle} variant="body1">
-            {calculatePercentChange(previousPrice, currentPrice)}%
+            {calculateDollarChange(previousPrice, currentPrice)}
+          </Typography>
+          <Typography style={fontStyle} variant="body2">
+            {"("}
+            {calculatePercentChange(previousPrice, currentPrice)}
+            {")"}%
           </Typography>
         </StockCardContainer>
       </Card>
