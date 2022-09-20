@@ -61,7 +61,7 @@ const StockCard: React.FC<{
           <Typography variant="body1">
             {cardstate == "loading"
               ? "Loading..."
-              : "Error: could not retrieve stock data for this symbol"}
+              : "Error: Could not retrieve stock data for this symbol, \n please check your connection."}
           </Typography>
         </StockCardContainer>
       </Card>
@@ -78,20 +78,19 @@ const StockCard: React.FC<{
     return Price
   }
 
-  const calculatePercentChange = (openPrice, currentPrice) => {
-    var percentChange = ((currentPrice - openPrice) / openPrice) * 100
+  const calculatePercentChange = (previousPrice, currentPrice) => {
+    var percentChange = ((currentPrice - previousPrice) / previousPrice) * 100
     if (percentChange > 0) {
-      return "+" + percentChange.toFixed(2)
+      return /*"+" +*/ percentChange.toFixed(2)
     } else {
       return percentChange.toFixed(2)
     }
   }
 
-  const colorCalculator = (openPrice, currentPrice) => {
+  const colorCalculator = (percentChange) => {
     var color = ""
-    var percentChange = ((currentPrice - openPrice) / openPrice) * 100
     if (percentChange > 0) {
-      color = "rgb(51, 255, 51, 0.8)"
+      color = "rgb(51, 233, 39, 0.8)"
     }
     if (percentChange < 0) {
       color = "rgb(233, 53, 39, 0.8)"
@@ -100,11 +99,11 @@ const StockCard: React.FC<{
   }
 
   if (stockData.meta && stockData.values) {
+    var currentPrice = parseFloat(stockData.values[0].close)
+    var previousPrice = parseFloat(stockData.values[1].close)
     var symbolColor = colorCalculator(
-      parseFloat(stockData.values[1].close),
-      parseFloat(stockData.values[0].close)
+      calculatePercentChange(previousPrice, currentPrice)
     )
-
     var fontStyle = {
       color: symbolColor,
     }
@@ -114,14 +113,10 @@ const StockCard: React.FC<{
         <StockCardContainer onDelete={onDelete}>
           <Typography variant="h5">{stockData.meta.symbol}</Typography>
           <Typography variant="body1">
-            ${deleteTrailingZeros(parseFloat(stockData.values[0].close))}
+            ${deleteTrailingZeros(currentPrice)}
           </Typography>
           <Typography style={fontStyle} variant="body1">
-            {calculatePercentChange(
-              parseFloat(stockData.values[1].close),
-              parseFloat(stockData.values[0].close)
-            )}
-            %
+            {calculatePercentChange(previousPrice, currentPrice)}%
           </Typography>
         </StockCardContainer>
       </Card>
@@ -131,7 +126,7 @@ const StockCard: React.FC<{
       <Card style={cardStyle}>
         <StockCardContainer onDelete={onDelete}>
           <Typography variant="body1">
-            Error: could not retrieve stock data for this symbol
+            Error: Could not retrieve stock data for this symbol.
           </Typography>
         </StockCardContainer>
       </Card>
