@@ -28,7 +28,7 @@ export async function fetchTwelveDataData(
   }
 
   const RES = await fetch(
-    "http://localhost:8000/twelve-data?ticker=" + ticker,
+    "https://tranquil-castle-98436.herokuapp.com/twelve-data?ticker=" + ticker,
     {
       method: "GET",
       headers: {

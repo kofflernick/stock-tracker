@@ -9,8 +9,6 @@ import {
 } from "@material-ui/core"
 import { fetchTwelveDataData, TwelveDataData } from "../../utils/api"
 import "./StockCard.css"
-import { red } from "@material-ui/core/colors"
-//import { ControlPointSharp } from "@material-ui/icons"
 
 var cardStyle = {
   display: "inline-block",
@@ -61,7 +59,7 @@ const StockCard: React.FC<{
           <Typography variant="body1">
             {cardstate == "loading"
               ? "Loading..."
-              : "Error: Could not retrieve stock data for this symbol, \n please check your connection."}
+              : "Error: Could not retrieve stock data for this symbol \n please check your connection."}
           </Typography>
         </StockCardContainer>
       </Card>
