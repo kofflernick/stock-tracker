@@ -6,6 +6,8 @@ import {
   CardActions,
   CardContent,
   Typography,
+  LinearProgress,
+  CircularProgress,
 } from "@material-ui/core"
 import { fetchTwelveDataData, TwelveDataData } from "../../utils/api"
 import "./StockCard.css"
@@ -19,8 +21,12 @@ const StockCardContainer: React.FC<{
   onDelete?: () => void
 }> = ({ children, onDelete }) => {
   return (
-    <Box mx={"14px"} my={"16px"}>
-      <Card style={cardStyle}>
+    <Box
+      mx={"14px"}
+      my={"16px"}
+      style={{ display: "flex", justifyContent: "center" }}
+    >
+      <Card style={cardStyle} className="InnerCardLoading">
         <CardContent>{children}</CardContent>
         <CardActions>
           {onDelete && (
@@ -54,13 +60,14 @@ const StockCard: React.FC<{
 
   if (cardstate == "loading" || cardstate == "error") {
     return (
-      <Card style={cardStyle}>
+      <Card style={cardStyle} className="Card">
         <StockCardContainer onDelete={onDelete}>
-          <Typography variant="body1">
-            {cardstate == "loading"
-              ? "Loading..."
-              : "Error: Could not retrieve stock data for this symbol \n please check your connection."}
-          </Typography>
+          <Box my="48px">
+            {cardstate == "loading" && <LinearProgress color="secondary" />}
+            <Typography variant="body1">
+              {cardstate == "loading" ? "" : "Error: \nConnection"}
+            </Typography>
+          </Box>
         </StockCardContainer>
       </Card>
     )
@@ -104,7 +111,7 @@ const StockCard: React.FC<{
     return color
   }
 
-  if (stockData.meta && stockData.values) {
+  if (cardstate == "ready" && stockData.meta && stockData.values) {
     var currentPrice = parseFloat(stockData.values[0].close)
     var previousPrice = parseFloat(stockData.values[1].close)
     var symbolColor = colorCalculator(
@@ -134,11 +141,11 @@ const StockCard: React.FC<{
     )
   } else {
     return (
-      <Card style={cardStyle}>
+      <Card style={cardStyle} className="Card">
         <StockCardContainer onDelete={onDelete}>
-          <Typography variant="body1">
-            Error: Could not retrieve stock data for this symbol.
-          </Typography>
+          <Box my="38px">
+            <Typography variant="body1">Error</Typography>
+          </Box>
         </StockCardContainer>
       </Card>
     )

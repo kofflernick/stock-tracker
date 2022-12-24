@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import ReactDOM from "react-dom"
-import { fetchTwelveDataData, TwelveDataData } from "../utils/api"
 import {
   Box,
   Grid,
@@ -14,58 +13,111 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Button,
+  Tooltip,
+  TextField,
+  Badge,
 } from "@material-ui/core"
-import { Add as AddIcon } from "@material-ui/icons"
+import AutoGraphSharpIcon from "@mui/icons-material/AutoGraphSharp"
+import SettingsIcon from "@mui/icons-material/Settings"
+import AppsIcon from "@mui/icons-material/Apps"
 import "fontsource-roboto"
 import "./popup.css"
 import StockCard from "./StockCard"
 import { setStoredTickers, getStoredTickers } from "../utils/storage"
+import SearchBar from "./SearchBar"
+import TopMoversTableRow from "./TopMoversTableRow"
+import Settings from "./Settings"
 
 const App: React.FC<{}> = () => {
   const [tickers, setTickers] = useState<string[]>([])
 
   const [tickerInput, setTickerInput] = useState<string>("")
 
+  const [showTable, setShowTable] = useState(false)
+
+  const [showSettings, setShowSettings] = useState(false)
+
+  const [showCards, setShowCards] = useState(true)
+
+  const [invisible, setInvisible] = useState(true)
+
+  const [badgeCount, setBadgeCount] = useState(0)
+
+  const appsIconRef = useRef<HTMLDivElement>(null)
+
+  const [shake, setShake] = useState(false)
+
   useEffect(() => {
     getStoredTickers().then((tickers) => setTickers(tickers))
   }, [])
 
-  /*table view stock going in here */
-  // var inputArray = ["cvx", "aapl", "bbby", "amzn", "nflx"]
-  // var array = []
-  // useEffect(() => {
-  //   for (var i = 0; i < inputArray.length; i++) {
-  //     fetchTwelveDataData(inputArray[i]).then((data) => array.push(data))
-  //   }
-  //   console.log(array)
-  // }, [])
+  /* functions of the search bar that handle an input from the user.
+  upon clicking the add button or pressing enter a stock card is 
+  made in tile view for the ticker and the user is automatically 
+  taken to stock tile view. If a duplicate ticker is attempted to be added 
+  a shaking animation is added to the search bar and tickers is not
+  updated */
 
   const handleTickerButtonClick = () => {
-    if (tickerInput === "") {
-      return
-    }
-    const updatedTickers = [...tickers, tickerInput]
-    setStoredTickers(updatedTickers).then(() => {
-      setTickers(updatedTickers)
+    if (tickerInput === "" || tickers.includes(tickerInput.toUpperCase())) {
+      appsIconRef.current.classList.add("shake-animation")
+      setTimeout(() => {
+        appsIconRef.current.classList.remove("shake-animation")
+      }, 1000)
       setTickerInput("")
-    })
-  }
-
-  //this shows what is being put into the input bar AS you type it
-  console.log(tickerInput)
-
-  //function that will handle enter button for adding tickers
-  const handleTickerEnterClick = (Event) => {
-    if (tickerInput === "") {
+      setShake(true)
       return
-    } else if (Event.key === "Enter") {
-      console.log("enter pressed")
-      const updatedTickers = [...tickers, tickerInput]
+    } else if (tickerInput !== "") {
+      console.log(tickerInput)
+      const updatedTickers = [...tickers, tickerInput.toUpperCase()]
       setStoredTickers(updatedTickers).then(() => {
         setTickers(updatedTickers)
         setTickerInput("")
       })
+      handleAppsIconButtonClick()
     }
+  }
+
+  const handleTickerEnterClick = (Event) => {
+    if (Event.key === "Enter" && tickers.includes(tickerInput.toUpperCase())) {
+      appsIconRef.current.classList.add("shake-animation")
+      setTimeout(() => {
+        appsIconRef.current.classList.remove("shake-animation")
+      }, 1000)
+      setTickerInput("")
+      setShake(true)
+      return
+    } else if (Event.key === "Enter" && tickerInput !== "") {
+      console.log(tickerInput)
+      const updatedTickers = [...tickers, tickerInput.toUpperCase()]
+      setStoredTickers(updatedTickers).then(() => {
+        setTickers(updatedTickers)
+        setTickerInput("")
+      })
+      handleAppsIconButtonClick()
+    }
+  }
+
+  /* add tickers from the top movers table to
+  the stock tiles page and delete tickers from the stock tiles page */
+
+  const handleTopMoversAddButtonClick = (ticker: string) => {
+    if (tickers.includes(ticker)) {
+      appsIconRef.current.classList.add("shake-animation-topMover")
+      setTimeout(() => {
+        appsIconRef.current.classList.remove("shake-animation-topMover")
+      }, 1000)
+      return
+    }
+    const updatedTickers = [...tickers, ticker]
+    setStoredTickers(updatedTickers).then(() => {
+      setTickers(updatedTickers)
+    })
+    if (invisible == true) {
+      setInvisible(!invisible)
+    }
+    setBadgeCount(badgeCount + 1)
   }
 
   const handleTickerDeleteButtonClick = (index: number) => {
@@ -76,42 +128,227 @@ const App: React.FC<{}> = () => {
     })
   }
 
-  /*start of table view*/
-  // if (tickers[0] == null) {
-  // }
+  /* three functions that toggle between stock tile view,
+  top movers view, and the settings page. top movers and stock tile
+  share a button that changes icon*/
 
-  return (
-    <Box mx="8px" my="16px">
-      <Box mx="8px" my="8px">
-        <Grid container>
-          <Grid item>
-            <Paper>
-              <Box px="15px" py="5px">
-                <InputBase
-                  className="Search"
-                  placeholder="Add a symbol name"
-                  value={tickerInput}
-                  onChange={(event) => setTickerInput(event.target.value)}
-                  onKeyDown={handleTickerEnterClick}
-                />
-                <IconButton onClick={handleTickerButtonClick}>
-                  <AddIcon />
+  const handleAutoGraphSharpIconButtonClick = () => {
+    if (showCards == true && showSettings == false) {
+      setShowCards(!showCards)
+      setShowTable(!showTable)
+    } else if (showCards == false && showSettings == true) {
+      setShowSettings(!showSettings)
+      setShowTable(!showTable)
+    }
+    setInvisible(!invisible)
+  }
+
+  const handleAppsIconButtonClick = () => {
+    if (showTable == true && showSettings == false) {
+      setShowTable(!showTable)
+      setShowCards(!showCards)
+    } else if (showTable == false && showSettings == true) {
+      setShowSettings(!showSettings)
+      setShowCards(!showCards)
+    }
+    setBadgeCount(0)
+  }
+
+  const handleSettingsIconButtonClick = () => {
+    if (showCards == true && showTable == false) {
+      setShowCards(!showCards)
+      setShowSettings(!showSettings)
+    } else if (showCards == false && showTable == true) {
+      setShowTable(!showTable)
+      setShowSettings(!showSettings)
+    }
+  }
+
+  /* hard coded tickers for the top movers view */
+
+  const tableTickers = ["IQ", "HEGIF", "MDGL", "ARWR", "NKE"]
+
+  if (showTable == true) {
+    return (
+      <Box mx="8px" my="16px">
+        <Box mx="8px" my="8px">
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            spacing={2}
+          >
+            <Grid item>
+              <SearchBar
+                tickerInput={tickerInput}
+                setTickerInput={setTickerInput}
+                handleTickerButtonClick={handleTickerButtonClick}
+                handleTickerEnterClick={handleTickerEnterClick}
+              />
+            </Grid>
+            <Grid item ref={appsIconRef}>
+              <Tooltip title="Stock tiles" arrow>
+                <IconButton onClick={handleAppsIconButtonClick}>
+                  {badgeCount > 0 && (
+                    <Badge badgeContent={badgeCount} color="secondary">
+                      <AppsIcon />
+                    </Badge>
+                  )}
+                  {badgeCount === 0 && <AppsIcon />}
                 </IconButton>
-              </Box>
-            </Paper>
+              </Tooltip>
+            </Grid>
+            <Grid item>
+              <Tooltip title="Settings" arrow>
+                <IconButton onClick={handleSettingsIconButtonClick}>
+                  <SettingsIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>
           </Grid>
-        </Grid>
+        </Box>
+        <Box mx="8px" my="16px">
+          <Grid container justifyContent="center" alignItems="center">
+            <Typography variant="h5">Top Movers</Typography>
+          </Grid>
+        </Box>
+        <Box>
+          <TableContainer component={Paper} className="table">
+            <Table>
+              <TableBody>
+                <Grid style={{ marginLeft: "18px" }}>
+                  {tableTickers.map((ticker, index) => (
+                    <TopMoversTableRow
+                      ticker={ticker}
+                      key={index}
+                      addButton={handleTopMoversAddButtonClick}
+                    />
+                  ))}
+                </Grid>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+        <Box height="16px" width="16px" />
       </Box>
-      {tickers.map((ticker, index) => (
-        <StockCard
-          ticker={ticker}
-          key={index}
-          onDelete={() => handleTickerDeleteButtonClick(index)}
-        />
-      ))}
-      <Box height="16px" width="16px" />
-    </Box>
-  )
+    )
+  } else if (showCards == true) {
+    return (
+      <Box mx="8px" my="16px">
+        <Box mx="8px" my="8px">
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            spacing={2}
+          >
+            <Grid item>
+              {shake == true ? (
+                <SearchBar
+                  tickerInput={tickerInput}
+                  setTickerInput={setTickerInput}
+                  handleTickerButtonClick={handleTickerButtonClick}
+                  handleTickerEnterClick={handleTickerEnterClick}
+                />
+              ) : (
+                <SearchBar
+                  tickerInput={tickerInput}
+                  setTickerInput={setTickerInput}
+                  handleTickerButtonClick={handleTickerButtonClick}
+                  handleTickerEnterClick={handleTickerEnterClick}
+                />
+              )}
+            </Grid>
+            <Grid item>
+              <Tooltip title="Top movers" arrow>
+                <IconButton onClick={handleAutoGraphSharpIconButtonClick}>
+                  <AutoGraphSharpIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+            <Grid item>
+              <Tooltip title="Settings" arrow>
+                <IconButton onClick={handleSettingsIconButtonClick}>
+                  <SettingsIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          </Grid>
+        </Box>
+        {tickers.length === 0 ? (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="100%"
+          >
+            <Box mx="8px" my="160px">
+              <Grid container justifyContent="center" alignItems="center">
+                <Typography variant="h5" className="background-text-color">
+                  No stocks added yet
+                </Typography>
+              </Grid>
+            </Box>
+          </Box>
+        ) : (
+          <Box my={"10px"}>
+            <div ref={appsIconRef}>
+              <Grid style={{ marginLeft: "8px" }}>
+                {tickers.map((ticker, index) => (
+                  <StockCard
+                    ticker={ticker}
+                    key={index}
+                    onDelete={() => handleTickerDeleteButtonClick(index)}
+                  />
+                ))}
+              </Grid>
+            </div>
+          </Box>
+        )}
+        <Box height="16px" width="16px" />
+      </Box>
+    )
+  } else if (showSettings == true) {
+    return (
+      <Box mx="8px" my="16px">
+        <Box mx="8px" my="8px">
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            spacing={2}
+          >
+            <Grid item>
+              <SearchBar
+                tickerInput={tickerInput}
+                setTickerInput={setTickerInput}
+                handleTickerButtonClick={handleTickerButtonClick}
+                handleTickerEnterClick={handleTickerEnterClick}
+              />
+            </Grid>
+            <Grid item>
+              <Tooltip title="Top movers" arrow>
+                <IconButton onClick={handleAutoGraphSharpIconButtonClick}>
+                  <AutoGraphSharpIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+            <Grid item>
+              <Tooltip title="Settings" arrow>
+                <IconButton onClick={handleSettingsIconButtonClick}>
+                  <SettingsIcon />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          </Grid>
+        </Box>
+        <Grid item>
+          <Settings />
+        </Grid>
+        <Box height="16px" width="16px" />
+      </Box>
+    )
+  }
 }
 
 const root = document.createElement("div")

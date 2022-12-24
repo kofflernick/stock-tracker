@@ -3,7 +3,7 @@ import ReactDOM from "react-dom"
 import "./options.css"
 
 const App: React.FC<{}> = () => {
-  return <div></div>
+  return <div>Hello World</div>
 }
 
 const root = document.createElement("div")

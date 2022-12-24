@@ -19,6 +19,7 @@
     "fetch": "^1.1.0",
     "fs": "^0.0.1-security",
     "node-fetch": "^3.2.10",
+    "priorityqueue": "^2.0.0",
     "ts-node": "^10.9.1"
   },
   "devDependencies": {

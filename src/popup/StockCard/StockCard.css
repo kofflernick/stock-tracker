@@ -1,3 +1,17 @@
 .Card {
+  width: 120px;
+  height: 218px;
   margin-right: 5px;
+}
+
+.StockCardContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.InnerCardLoading {
+  width: 100px;
+  height: 180px;
+  justify-content: center;
+  align-items: baseline;
 }
