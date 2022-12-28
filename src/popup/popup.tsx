@@ -17,6 +17,7 @@ import {
   Tooltip,
   TextField,
   Badge,
+  ClickAwayListener,
 } from "@material-ui/core"
 import AutoGraphSharpIcon from "@mui/icons-material/AutoGraphSharp"
 import SettingsIcon from "@mui/icons-material/Settings"
@@ -28,6 +29,7 @@ import { setStoredTickers, getStoredTickers } from "../utils/storage"
 import SearchBar from "./SearchBar"
 import TopMoversTableRow from "./TopMoversTableRow"
 import Settings from "./Settings"
+import { height } from "@mui/system"
 
 const App: React.FC<{}> = () => {
   const [tickers, setTickers] = useState<string[]>([])
@@ -47,6 +49,8 @@ const App: React.FC<{}> = () => {
   const appsIconRef = useRef<HTMLDivElement>(null)
 
   const [shake, setShake] = useState(false)
+
+  const [attemptedDuplicate, setAttemtpedDuplicate] = useState(false)
 
   useEffect(() => {
     getStoredTickers().then((tickers) => setTickers(tickers))
@@ -229,7 +233,7 @@ const App: React.FC<{}> = () => {
             </Table>
           </TableContainer>
         </Box>
-        <Box height="16px" width="16px" />
+        <Box height="46px" width="16px" />
       </Box>
     )
   } else if (showCards == true) {
@@ -243,21 +247,12 @@ const App: React.FC<{}> = () => {
             spacing={2}
           >
             <Grid item>
-              {shake == true ? (
-                <SearchBar
-                  tickerInput={tickerInput}
-                  setTickerInput={setTickerInput}
-                  handleTickerButtonClick={handleTickerButtonClick}
-                  handleTickerEnterClick={handleTickerEnterClick}
-                />
-              ) : (
-                <SearchBar
-                  tickerInput={tickerInput}
-                  setTickerInput={setTickerInput}
-                  handleTickerButtonClick={handleTickerButtonClick}
-                  handleTickerEnterClick={handleTickerEnterClick}
-                />
-              )}
+              <SearchBar
+                tickerInput={tickerInput}
+                setTickerInput={setTickerInput}
+                handleTickerButtonClick={handleTickerButtonClick}
+                handleTickerEnterClick={handleTickerEnterClick}
+              />
             </Grid>
             <Grid item>
               <Tooltip title="Top movers" arrow>
@@ -291,21 +286,19 @@ const App: React.FC<{}> = () => {
             </Box>
           </Box>
         ) : (
-          <Box my={"10px"}>
-            <div ref={appsIconRef}>
-              <Grid style={{ marginLeft: "8px" }}>
-                {tickers.map((ticker, index) => (
-                  <StockCard
-                    ticker={ticker}
-                    key={index}
-                    onDelete={() => handleTickerDeleteButtonClick(index)}
-                  />
-                ))}
-              </Grid>
-            </div>
-          </Box>
+          <div ref={appsIconRef}>
+            <Grid item style={{ marginLeft: "8px" }}>
+              {tickers.map((ticker, index) => (
+                <StockCard
+                  ticker={ticker}
+                  key={index}
+                  onDelete={() => handleTickerDeleteButtonClick(index)}
+                />
+              ))}
+            </Grid>
+          </div>
         )}
-        <Box height="16px" width="16px" />
+        <Box height="10px" width="16px" />
       </Box>
     )
   } else if (showSettings == true) {
