@@ -170,7 +170,16 @@ const App: React.FC<{}> = () => {
 
   /* hard coded tickers for the top movers view */
 
-  const tableTickers = ["IQ", "HEGIF", "MDGL", "ARWR", "NKE"]
+  const tableTickers = [
+    "AAPL",
+    "MSFT",
+    "AMZN",
+    "TSLA",
+    "GOOG",
+    "BBBY",
+    "T",
+    "GME",
+  ]
 
   if (showTable == true) {
     return (
@@ -213,7 +222,7 @@ const App: React.FC<{}> = () => {
         </Box>
         <Box mx="8px" my="16px">
           <Grid container justifyContent="center" alignItems="center">
-            <Typography variant="h5">Top Movers</Typography>
+            <Typography variant="h5">Favorites</Typography>
           </Grid>
         </Box>
         <Box>

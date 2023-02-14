@@ -137,6 +137,7 @@ const StockCard: React.FC<{
     return (
       <Card style={cardStyle} className="Card">
         <StockCardContainer onDelete={onDelete}>
+          <Typography variant="h5">{ticker}</Typography>
           <Box my="48px">
             {cardstate == "loading" && <LinearProgress color="secondary" />}
             <Typography variant="body1">
@@ -233,7 +234,6 @@ const StockCard: React.FC<{
       })
     }
     chartData.reverse()
-    console.log(chartData)
 
     const minPrice = Math.min(...chartData.map((d) => d.price))
     const maxPrice = Math.max(...chartData.map((d) => d.price))

@@ -43,7 +43,9 @@ const TopMoversTableRow: React.FC<{
         {cardstate == "loading" && (
           <TableRow style={{ height: "70px" }}>
             <TableCell align="left">
-              <Typography variant="body1">{ticker}</Typography>
+              <Button color="inherit" onClick={() => addButton(ticker)}>
+                <Typography variant="body1">{ticker}</Typography>
+              </Button>
             </TableCell>
             <TableCell align="left">
               <CircularProgress size={10} color={"inherit"} />
@@ -62,7 +64,9 @@ const TopMoversTableRow: React.FC<{
           ) : (
             <TableRow style={{ height: "70px" }}>
               <TableCell>
-                <Typography variant="body1">Error</Typography>
+                <Button color="inherit" onClick={() => addButton(ticker)}>
+                  <Typography variant="body1">{ticker}</Typography>
+                </Button>
               </TableCell>
               <TableCell>
                 <CircularProgress size={10} color={"inherit"} />
