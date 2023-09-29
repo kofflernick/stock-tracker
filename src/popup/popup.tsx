@@ -249,7 +249,7 @@ const App: React.FC<{}> = () => {
               />
             </Grid>
             <Grid item ref={appsIconRef}>
-              <Tooltip title="Stock tiles" arrow>
+              <Tooltip title="Tracker Window" arrow>
                 <IconButton onClick={handleAppsIconButtonClick}>
                   {badgeCount > 0 && (
                     <Badge badgeContent={badgeCount} color="secondary">
@@ -300,7 +300,7 @@ const App: React.FC<{}> = () => {
               />
             </Grid>
             <Grid item>
-              <Tooltip title="Top movers" arrow>
+              <Tooltip title="Favorites" arrow>
                 <IconButton onClick={handleAutoGraphSharpIconButtonClick}>
                   <AutoGraphSharpIcon />
                 </IconButton>
@@ -366,7 +366,7 @@ const App: React.FC<{}> = () => {
               />
             </Grid>
             <Grid item>
-              <Tooltip title="Top movers" arrow>
+              <Tooltip title="Favorites" arrow>
                 <IconButton onClick={handleAutoGraphSharpIconButtonClick}>
                   <AutoGraphSharpIcon />
                 </IconButton>
