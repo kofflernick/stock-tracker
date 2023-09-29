@@ -26,6 +26,7 @@ import {
 import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip"
 import EqualizerIcon from "@mui/icons-material/Equalizer"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
+import StarOutlineIcon from "@mui/icons-material/StarOutline"
 import { fetchTwelveDataData, TwelveDataData } from "../../utils/api"
 import "./StockCard.css"
 
@@ -38,14 +39,6 @@ const StockCardContainer: React.FC<{
   onDelete?: () => void
 }> = ({ children, onDelete }) => {
   const [open, setOpen] = React.useState(false)
-
-  const handleTooltipClose = () => {
-    setOpen(false)
-  }
-
-  const handleTooltipOpen = () => {
-    setOpen(true)
-  }
 
   const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -98,7 +91,8 @@ type StockCardState = "loading" | "error" | "ready"
 const StockCard: React.FC<{
   ticker: string
   onDelete?: () => void
-}> = ({ ticker, onDelete }) => {
+  addTickerToFavorites: (ticker: string) => void
+}> = ({ ticker, onDelete, addTickerToFavorites }) => {
   const [stockData, setStockData] = useState<TwelveDataData | null>(null)
   const [cardstate, setCardState] = useState<StockCardState>("loading")
   const [open, setOpen] = React.useState(false)
@@ -137,6 +131,22 @@ const StockCard: React.FC<{
     return (
       <Card style={cardStyle} className="Card">
         <StockCardContainer onDelete={onDelete}>
+          <IconButton
+            style={{
+              position: "absolute",
+              bottom: "-2px",
+              left: "55px",
+              transform: "scale(0.6)",
+              borderRadius: 5,
+              width: "10px",
+              height: "10px",
+            }}
+            onClick={() => {
+              // dont want to be able to favorite a non valid ticker
+            }}
+          >
+            <StarOutlineIcon />
+          </IconButton>
           <Typography variant="h5">{ticker}</Typography>
           <Box my="48px">
             {cardstate == "loading" && <LinearProgress color="secondary" />}
@@ -176,8 +186,8 @@ const StockCard: React.FC<{
     )
   }
 
-  const deleteTrailingZeros = (rawPrice) => {
-    var Price
+  const deleteTrailingZeros = (rawPrice: any) => {
+    var Price: any
     if (rawPrice < 1) {
       Price = rawPrice.toFixed(3)
     } else if (rawPrice >= 1 && rawPrice < 1000) {
@@ -189,12 +199,18 @@ const StockCard: React.FC<{
     return Price
   }
 
-  const calculatePercentChange = (previousPrice, currentPrice) => {
+  const calculatePercentChange = (
+    previousPrice: number,
+    currentPrice: number
+  ) => {
     var percentChange = ((currentPrice - previousPrice) / previousPrice) * 100
     return percentChange.toFixed(2)
   }
 
-  const calculateDollarChange = (previousPrice, currentPrice) => {
+  const calculateDollarChange = (
+    previousPrice: number,
+    currentPrice: number
+  ) => {
     var dollarChange = Math.abs(previousPrice - currentPrice)
     if (previousPrice > currentPrice) {
       return "-" + dollarChange.toFixed(2)
@@ -203,7 +219,7 @@ const StockCard: React.FC<{
     }
   }
 
-  const colorCalculator = (percentChange) => {
+  const colorCalculator = (percentChange: any) => {
     var color = ""
     if (percentChange > 0) {
       color = "rgb(51, 233, 39, 0.8)"
@@ -241,6 +257,22 @@ const StockCard: React.FC<{
     return (
       <Card style={cardStyle} className="Card">
         <StockCardContainer onDelete={onDelete}>
+          <IconButton
+            style={{
+              position: "absolute",
+              bottom: "-2px",
+              left: "55px",
+              transform: "scale(0.6)",
+              borderRadius: 5,
+              width: "10px",
+              height: "10px",
+            }}
+            onClick={() => {
+              addTickerToFavorites(ticker)
+            }}
+          >
+            <StarOutlineIcon />
+          </IconButton>
           <Typography variant="h5">{stockData.meta.symbol}</Typography>
           <Typography variant="body1">
             ${deleteTrailingZeros(currentPrice)}

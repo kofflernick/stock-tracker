@@ -25,14 +25,22 @@ import AppsIcon from "@mui/icons-material/Apps"
 import "fontsource-roboto"
 import "./popup.css"
 import StockCard from "./StockCard"
-import { setStoredTickers, getStoredTickers } from "../utils/storage"
+import {
+  setStoredTickers,
+  getStoredTickers,
+  setStoredFavTickers,
+  getStoredFavTickers,
+} from "../utils/storage"
 import SearchBar from "./SearchBar"
 import TopMoversTableRow from "./TopMoversTableRow"
 import Settings from "./Settings"
 import { height } from "@mui/system"
+import Favorites from "./Favorites"
 
 const App: React.FC<{}> = () => {
   const [tickers, setTickers] = useState<string[]>([])
+
+  const [favTickers, setFavTickers] = useState<string[]>([])
 
   const [tickerInput, setTickerInput] = useState<string>("")
 
@@ -55,6 +63,58 @@ const App: React.FC<{}> = () => {
   useEffect(() => {
     getStoredTickers().then((tickers) => setTickers(tickers))
   }, [])
+
+  useEffect(() => {
+    getStoredFavTickers().then((favTickers) => setFavTickers(favTickers))
+  }, [])
+
+  useEffect(() => {
+    setStoredFavTickers(favTickers)
+  }, [favTickers])
+
+  // function to add tickers from the favorites page back to the tile view
+  const addFavoriteToTickers = (ticker: string) => {
+    if (tickers.includes(ticker.toUpperCase())) {
+      appsIconRef.current.classList.add("shake-animation")
+      setTimeout(() => {
+        appsIconRef.current.classList.remove("shake-animation")
+      }, 1000)
+      setTickerInput("")
+      setShake(true)
+      return
+    } else {
+      const updatedTickers = [...tickers, ticker.toUpperCase()]
+      setStoredTickers(updatedTickers).then(() => {
+        setTickers(updatedTickers)
+      })
+    }
+    if (invisible == true) {
+      setInvisible(!invisible)
+    }
+    setBadgeCount(badgeCount + 1)
+  }
+
+  // function to clear the favorites array
+  const clearFavorites = () => {
+    setFavTickers([])
+  }
+
+  // Function to add a ticker to favorites
+  const addTickerToFavorites = (ticker: string) => {
+    if (favTickers.includes(ticker.toUpperCase())) {
+      appsIconRef.current.classList.add("shake-animation")
+      setTimeout(() => {
+        appsIconRef.current.classList.remove("shake-animation")
+      }, 1000)
+      setTickerInput("")
+      setShake(true)
+      return
+    } else {
+      const updatedFavTickers = [...favTickers, ticker.toUpperCase()]
+      setFavTickers(updatedFavTickers)
+    }
+    console.log(favTickers)
+  }
 
   /* functions of the search bar that handle an input from the user.
   upon clicking the add button or pressing enter a stock card is 
@@ -81,6 +141,7 @@ const App: React.FC<{}> = () => {
       })
       handleAppsIconButtonClick()
     }
+    console.log(tickers)
   }
 
   const handleTickerEnterClick = (Event) => {
@@ -101,6 +162,7 @@ const App: React.FC<{}> = () => {
       })
       handleAppsIconButtonClick()
     }
+    console.log(tickers)
   }
 
   /* add tickers from the top movers table to
@@ -168,19 +230,6 @@ const App: React.FC<{}> = () => {
     }
   }
 
-  /* hard coded tickers for the top movers view */
-
-  const tableTickers = [
-    "AAPL",
-    "MSFT",
-    "AMZN",
-    "TSLA",
-    "GOOG",
-    "BBBY",
-    "T",
-    "GME",
-  ]
-
   if (showTable == true) {
     return (
       <Box mx="8px" my="16px">
@@ -220,27 +269,14 @@ const App: React.FC<{}> = () => {
             </Grid>
           </Grid>
         </Box>
-        <Box mx="8px" my="16px">
-          <Grid container justifyContent="center" alignItems="center">
-            <Typography variant="h5">Favorites</Typography>
-          </Grid>
-        </Box>
         <Box>
-          <TableContainer component={Paper} className="table">
-            <Table>
-              <TableBody>
-                <Grid style={{ marginLeft: "18px" }}>
-                  {tableTickers.map((ticker, index) => (
-                    <TopMoversTableRow
-                      ticker={ticker}
-                      key={index}
-                      addButton={handleTopMoversAddButtonClick}
-                    />
-                  ))}
-                </Grid>
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <Grid item>
+            <Favorites
+              favTickers={favTickers}
+              addFavorite={addFavoriteToTickers}
+              clearFavorites={clearFavorites}
+            />
+          </Grid>
         </Box>
         <Box height="46px" width="16px" />
       </Box>
@@ -302,6 +338,7 @@ const App: React.FC<{}> = () => {
                   ticker={ticker}
                   key={index}
                   onDelete={() => handleTickerDeleteButtonClick(index)}
+                  addTickerToFavorites={addTickerToFavorites}
                 />
               ))}
             </Grid>
